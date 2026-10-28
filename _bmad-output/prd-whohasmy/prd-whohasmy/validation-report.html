@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>PRD Validation: WhoHasMy</title>
+<style>
+  :root {
+    --bg: #fafaf9;
+    --surface: #ffffff;
+    --border: #e7e5e4;
+    --text: #1c1917;
+    --muted: #78716c;
+
+    --verdict-strong: #16a34a;
+    --verdict-adequate: #65a30d;
+    --verdict-thin: #d97706;
+    --verdict-broken: #dc2626;
+
+    --sev-low: #64748b;
+    --sev-medium: #ca8a04;
+    --sev-high: #ea580c;
+    --sev-critical: #dc2626;
+
+    --grade-exc: #16a34a;
+    --grade-good: #65a30d;
+    --grade-fair: #d97706;
+    --grade-poor: #dc2626;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    font-size: 15px;
+  }
+  .container { max-width: 960px; margin: 0 auto; padding: 32px 24px 64px; }
+
+  header.report-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 24px;
+  }
+  .title h1 { margin: 0; font-size: 22px; font-weight: 600; letter-spacing: -0.01em; }
+  .title .subtitle { color: var(--muted); font-size: 13px; margin-top: 4px; font-family: ui-monospace, "SF Mono", Menlo, monospace; }
+  .grade {
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-weight: 600;
+    color: white;
+    font-size: 15px;
+    white-space: nowrap;
+  }
+  .grade-excellent { background: var(--grade-exc); }
+  .grade-good { background: var(--grade-good); }
+  .grade-fair { background: var(--grade-fair); }
+  .grade-poor { background: var(--grade-poor); }
+
+  .synthesis {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--muted);
+    border-radius: 8px;
+    padding: 18px 22px;
+    margin-bottom: 24px;
+    font-size: 15.5px;
+  }
+  .synthesis p { margin: 0 0 10px; }
+  .synthesis p:last-child { margin-bottom: 0; }
+
+  .dimension-summary {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 10px;
+    margin-bottom: 24px;
+  }
+  .dim-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 14px;
+  }
+  .dim-card .dim-name { font-size: 13px; color: var(--muted); margin-bottom: 6px; }
+  .dim-card .dim-verdict { font-size: 14px; font-weight: 600; }
+
+  section.dimension, section.reviewer-section { margin-bottom: 14px; }
+  section.dimension details, section.reviewer-section details {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  section summary {
+    padding: 14px 20px;
+    cursor: pointer;
+    user-select: none;
+    list-style: none;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  section summary::-webkit-details-marker { display: none; }
+  section summary::before {
+    content: "▸";
+    display: inline-block;
+    color: var(--muted);
+    transition: transform 0.15s ease;
+  }
+  section details[open] summary::before { transform: rotate(90deg); }
+  section summary h2 {
+    display: inline;
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: -0.005em;
+    flex: 1;
+  }
+  .verdict-pill {
+    font-size: 11px;
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: white;
+  }
+  .verdict-strong { background: var(--verdict-strong); }
+  .verdict-adequate { background: var(--verdict-adequate); }
+  .verdict-thin { background: var(--verdict-thin); }
+  .verdict-broken { background: var(--verdict-broken); }
+
+  .dim-body { padding: 4px 20px 18px; }
+  .dim-judgment { color: var(--text); font-size: 14.5px; }
+  .dim-judgment p { margin: 0 0 10px; }
+
+  .findings-list { padding: 0 20px 4px; }
+  article.finding {
+    padding: 14px 0;
+    border-top: 1px solid var(--border);
+  }
+  article.finding:first-child { border-top: none; }
+  article.finding header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 6px;
+  }
+  .badge {
+    font-size: 10.5px;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    line-height: 1.4;
+  }
+  .badge-sev-low { background: rgba(100, 116, 139, 0.12); color: var(--sev-low); }
+  .badge-sev-medium { background: rgba(202, 138, 4, 0.14); color: var(--sev-medium); }
+  .badge-sev-high { background: rgba(234, 88, 12, 0.14); color: var(--sev-high); }
+  .badge-sev-critical { background: rgba(220, 38, 38, 0.14); color: var(--sev-critical); }
+  .finding-title { margin: 0; font-size: 15px; font-weight: 500; flex: 1; min-width: 200px; }
+  .finding-location { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 12.5px; color: var(--muted); }
+  .finding-note, .finding-fix { margin-top: 6px; font-size: 14px; }
+  .finding-fix strong { color: var(--muted); font-weight: 500; }
+
+  .reviewer-source {
+    font-size: 12px;
+    color: var(--muted);
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  }
+
+  .mechanical {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin-top: 24px;
+    font-size: 14px;
+  }
+  .mechanical h3 { margin: 0 0 10px; font-size: 14px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; }
+  .mechanical ul { margin: 0; padding-left: 20px; }
+  .mechanical li { margin-bottom: 4px; color: var(--text); }
+
+  footer.report-footer {
+    margin-top: 40px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+    font-size: 12px;
+    color: var(--muted);
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  }
+  footer .meta { display: flex; gap: 24px; flex-wrap: wrap; }
+</style>
+</head>
+<body>
+  <div class="container">
+
+    <header class="report-header">
+      <div class="title">
+        <h1>WhoHasMy — Validation Report</h1>
+        <div class="subtitle">_bmad-output/prd-whohasmy/prd-whohasmy/prd-whohasmy.md</div>
+      </div>
+      <div class="grade grade-good">Good</div>
+    </header>
+
+    <div class="synthesis">
+      <p>This is a genuinely good solo-stakes PRD: a clear thesis (never forget who has your stuff, never re-buy), features that all serve it, a consistent glossary, and FRs that mostly carry real testable consequences. The risk is concentrated in one place — the notification subsystem, which is the product's core promise, rests on an unspecified email delivery mechanism and contains a contact-data contradiction (phone-only contacts can receive no v1 notifications). Fix the notification findings and this is buildable as written.</p>
+    </div>
+
+    <div class="dimension-summary">
+      <div class="dim-card">
+        <div class="dim-name">Decision-readiness</div>
+        <div class="dim-verdict" style="color: var(--verdict-adequate)">adequate</div>
+      </div>
+      <div class="dim-card">
+        <div class="dim-name">Substance over theater</div>
+        <div class="dim-verdict" style="color: var(--verdict-strong)">strong</div>
+      </div>
+      <div class="dim-card">
+        <div class="dim-name">Strategic coherence</div>
+        <div class="dim-verdict" style="color: var(--verdict-strong)">strong</div>
+      </div>
+      <div class="dim-card">
+        <div class="dim-name">Done-ness clarity</div>
+        <div class="dim-verdict" style="color: var(--verdict-adequate)">adequate</div>
+      </div>
+      <div class="dim-card">
+        <div class="dim-name">Scope honesty</div>
+        <div class="dim-verdict" style="color: var(--verdict-adequate)">adequate</div>
+      </div>
+      <div class="dim-card">
+        <div class="dim-name">Downstream usability</div>
+        <div class="dim-verdict" style="color: var(--verdict-strong)">strong</div>
+      </div>
+      <div class="dim-card">
+        <div class="dim-name">Shape fit</div>
+        <div class="dim-verdict" style="color: var(--verdict-strong)">strong</div>
+      </div>
+    </div>
+
+    <section class="dimension">
+      <details>
+        <summary>
+          <h2>Decision-readiness</h2>
+          <span class="verdict-pill verdict-adequate">adequate</span>
+        </summary>
+        <div class="dim-body">
+          <div class="dim-judgment">
+            <p>Decisions are stated as decisions, and the memlog confirms they were actually made rather than defaulted: risk thresholds are pinned to concrete values (§4.5 FR-17: "Low: 2 days overdue… High: More than 5 days overdue"), SMS is explicitly deferred (§4.4 FR-15), and the local-only storage bet is made with eyes open (§5.2: "Local device storage only (no cloud, no accounts, no sync)"). Trade-offs name what was given up — the Out of Scope section (§7) surrenders cloud sync, multi-device, and borrower accounts explicitly.</p>
+            <p>What keeps this from <em>strong</em>: the PRD has no Open Questions section and no <code>[NOTE FOR PM]</code> callouts, and the one place where a real unresolved tension lives — how a local-only, account-free app actually sends email — is smoothed over as if settled. FR-13 references "the owner's configured email address," but no FR configures it, and no section names the delivery mechanism (SMTP? third-party service? in-app send?). A decision-maker reading this PRD would approve it without ever confronting the question that most shapes the architecture.</p>
+          </div>
+        </div>
+        <div class="findings-list">
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-high">high</span>
+              <h3 class="finding-title">Email delivery mechanism unspecified</h3>
+              <span class="finding-location">§4.4, §5.2</span>
+            </header>
+            <div class="finding-note">The borrower "simply receives email alerts" (§1) and FR-9/13/14 all send email, but the PRD never says <em>how</em>. A local-storage, no-account, no-backend app cannot send email without either user-supplied SMTP credentials or an external email service; §7 permits "email/SMS" integrations but names none. This is the PRD's single biggest silent decision.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Add a short "Notification delivery" decision note: chosen mechanism, what the user must configure (e.g., SMTP settings screen), and fallback behavior when email fails.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-medium">medium</span>
+              <h3 class="finding-title">Owner email configuration has no FR</h3>
+              <span class="finding-location">§4.4 FR-13</span>
+            </header>
+            <div class="finding-note">"System sends an email to the owner's configured email address" implies a settings flow that doesn't exist anywhere in §4.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Add an FR (owner notification preferences: email address, thresholds, intervals) or fold configuration into FR-13's consequences.</div>
+          </article>
+        </div>
+      </details>
+    </section>
+
+    <section class="dimension">
+      <details>
+        <summary>
+          <h2>Substance over theater</h2>
+          <span class="verdict-pill verdict-strong">strong</span>
+        </summary>
+        <div class="dim-body">
+          <div class="dim-judgment">
+            <p>No persona theater — Mary is the single user and she drives every FR and UJ. No innovation theater — the Vision is earned and specific ("or worse, when you've already re-purchased a replacement," §1) rather than a category-generic statement. NFRs are mostly product-specific with real numbers: "~100 items," "Dashboard loads in under 2 seconds with 100 items," four named Flutter targets (§5.1–5.2). The UJs carry actual decision content (UJ-5's on-the-spot registration became FR-12), which is the opposite of furniture.</p>
+          </div>
+        </div>
+        <div class="findings-list">
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-medium">medium</span>
+              <h3 class="finding-title">"Reliably" is an adjective, not a bound</h3>
+              <span class="finding-location">§5.4</span>
+            </header>
+            <div class="finding-note">"Notifications must be sent reliably when due dates are reached" is exactly the copied-boilerplate pattern the rest of §5 avoids. No retry policy, no delivery window, no failure surfacing.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Replace with a bound, e.g., "Overdue notifications are attempted within 1 hour of the due date passing and retried daily; failed sends are visible on the dashboard."</div>
+          </article>
+        </div>
+      </details>
+    </section>
+
+    <section class="dimension">
+      <details>
+        <summary>
+          <h2>Strategic coherence</h2>
+          <span class="verdict-pill verdict-strong">strong</span>
+        </summary>
+        <div class="dim-body">
+          <div class="dim-judgment">
+            <p>The PRD has a thesis and every feature serves it: register → loan → get reminded → risk-ranked dashboard → return. Nothing in §4 is a capability someone just wanted; even In-Maintenance (FR-11) supports the "is it available?" question the thesis poses. Prioritization follows the thesis — the dashboard and escalation emails are the product, and they're specified most fully. MVP scope kind is problem-solving and the scope logic matches.</p>
+            <p>The Success Metrics (§6) are the weak joint: the primary metric ("Mary remembers who has her stuff without having to re-purchase items") states the thesis but names no measurement. The counter-metric ("No user complaints about notification delivery") is fine at solo stakes.</p>
+          </div>
+        </div>
+        <div class="findings-list">
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-medium">medium</span>
+              <h3 class="finding-title">Primary success metric is unmeasurable</h3>
+              <span class="finding-location">§6</span>
+            </header>
+            <div class="finding-note">"Mary remembers who has her stuff" has no measurement method; you can't tell at the end of v1 whether the thesis validated.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Make it checkable, e.g., "Mary can name who holds any loaned item within 10 seconds of opening the dashboard" or "zero re-purchases of loaned items in the first 3 months."</div>
+          </article>
+        </div>
+      </details>
+    </section>
+
+    <section class="dimension">
+      <details>
+        <summary>
+          <h2>Done-ness clarity</h2>
+          <span class="verdict-pill verdict-adequate">adequate</span>
+        </summary>
+        <div class="dim-body">
+          <div class="dim-judgment">
+            <p>This is the PRD's best structural habit: every FR (except FR-15) carries a "Consequences (testable)" block, and most are genuinely testable ("System does not allow creating a new loan for an item in <em>In-Maintenance</em> status," FR-11). An engineer could write stories from §4.1–4.3 and §4.5 almost as-is.</p>
+            <p>The notification FRs are where "done" gets fuzzy, and one data-model contradiction will bite immediately:</p>
+          </div>
+        </div>
+        <div class="findings-list">
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-high">high</span>
+              <h3 class="finding-title">Phone-only contacts can't receive any v1 notification</h3>
+              <span class="finding-location">§4.2 FR-7 vs §4.4</span>
+            </header>
+            <div class="finding-note">FR-7 requires "at least an email or phone number," but every notification FR (FR-9, 13, 14) sends email only and FR-15 defers SMS. A phone-only contact silently gets nothing — the loan is created, the borrower is never reminded, and Mary has no indication why.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Either require email for contacts used in loans, or add a consequence to FR-9 ("System warns when loaning to a contact with no email address").</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-medium">medium</span>
+              <h3 class="finding-title">"Stronger/more urgent" and "possibly with additional follow-up" are not testable</h3>
+              <span class="finding-location">§4.4 FR-14</span>
+            </header>
+            <div class="finding-note">The escalation ladder's consequence says "Email content and urgency scale with risk level," but nothing defines what changes: subject line, wording, frequency? "Possibly" is unbuildable.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Define the scaling concretely — e.g., distinct subject-line prefixes per risk level and a stated send frequency per tier — and delete "possibly."</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-medium">medium</span>
+              <h3 class="finding-title">Configurability claimed with no configuration surface</h3>
+              <span class="finding-location">§4.4 FR-13, FR-14</span>
+            </header>
+            <div class="finding-note">Both FRs say thresholds/intervals are "configurable," but no FR or section describes where Mary configures them.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Add the settings FR from the Decision-readiness finding and have FR-13/14 reference it.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-medium">medium</span>
+              <h3 class="finding-title">Orphaned loan behavior after item deletion is ambiguous</h3>
+              <span class="finding-location">§4.1 FR-4</span>
+            </header>
+            <div class="finding-note">"The active loan is preserved but the item is removed from the catalog" leaves the loan pointing at a deleted item: does it still appear on the dashboard? Can it be returned?</div>
+            <div class="finding-fix"><strong>Fix:</strong> Add a consequence, e.g., "Active loans for deleted items remain on the dashboard until returned; the item shows as '[deleted]'."</div>
+          </article>
+        </div>
+      </details>
+    </section>
+
+    <section class="dimension">
+      <details>
+        <summary>
+          <h2>Scope honesty</h2>
+          <span class="verdict-pill verdict-adequate">adequate</span>
+        </summary>
+        <div class="dim-body">
+          <div class="dim-judgment">
+            <p>The Out of Scope section (§7) does real work — borrower app, cloud sync, accounts, monetization, barcode scanning are all named, so nothing important is left to inference. De-scoping is honest and explicit (FR-15 marks SMS as <em>Deferred</em> rather than silently dropping it). Open-item density is low, which is right for solo stakes.</p>
+            <p>The gap: the PRD uses no <code>[ASSUMPTION]</code> tags and no Open Questions section, and the assumptions it does make are load-bearing and invisible — chiefly that email delivery "just works" from a local-only app (see Decision-readiness), and that ~100 items is the right scale ceiling. For a green-light-to-build document, the email assumption is the one that deserved to be surfaced rather than implied.</p>
+          </div>
+        </div>
+        <div class="findings-list">
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-medium">medium</span>
+              <h3 class="finding-title">Load-bearing assumptions untagged</h3>
+              <span class="finding-location">§4.4, §5.2</span>
+            </header>
+            <div class="finding-note">The email-mechanism assumption and the single-device assumption (what happens when Mary switches phones? no export/backup is scoped) are never marked as assumptions a reviewer could push back on.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Tag them inline (<code>[ASSUMPTION: …]</code>) and index at the end, per the PRD's own conventions.</div>
+          </article>
+        </div>
+      </details>
+    </section>
+
+    <section class="dimension">
+      <details>
+        <summary>
+          <h2>Downstream usability</h2>
+          <span class="verdict-pill verdict-strong">strong</span>
+        </summary>
+        <div class="dim-body">
+          <div class="dim-judgment">
+            <p>This PRD is clean to source-extract from. The Glossary (§3) defines every domain noun and the FRs use those terms verbatim and consistently — <em>Available/Loaned/In-Maintenance</em>, <em>Risk Level</em>, <em>Dashboard</em> all match across §3, §4, and the UJs. FR-1 through FR-17 are contiguous and unique; UJ-1 through UJ-5 are contiguous; every UJ has Mary as a named protagonist carrying context inline. Each FR section reads sensibly pulled out alone. Sofia can cite FR ids as sources without ambiguity.</p>
+          </div>
+        </div>
+        <div class="findings-list">
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-low">low</span>
+              <h3 class="finding-title">Success Metrics have no IDs</h3>
+              <span class="finding-location">§6</span>
+            </header>
+            <div class="finding-note">FRs and UJs are ID'd but metrics aren't, so downstream docs can't reference them precisely.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Add SM-1/SM-2/CM-1 labels.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-low">low</span>
+              <h3 class="finding-title">FR-15 is a scope note wearing an FR id</h3>
+              <span class="finding-location">§4.4</span>
+            </header>
+            <div class="finding-note">It has no consequences block and describes a non-feature; a naive story generator would create a ticket for it.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Move it to §7 Out of Scope with a pointer, or keep the id but mark it clearly as deferred-scope.</div>
+          </article>
+        </div>
+      </details>
+    </section>
+
+    <section class="dimension">
+      <details>
+        <summary>
+          <h2>Shape fit</h2>
+          <span class="verdict-pill verdict-strong">strong</span>
+        </summary>
+        <div class="dim-body">
+          <div class="dim-judgment">
+            <p>Right-sized for a hobby/solo product. The rubric says solo means "rigor light, substance bar still applies," and this PRD hits that: no enterprise formality, no multi-stakeholder machinery, but the substance (testable consequences, explicit thresholds, honest Out of Scope) is all there. Five UJs for a single-operator tool is at the formal end, but each one maps to a real flow and two of them (UJ-3, UJ-5) drove actual FRs, so they earn their place rather than decorating the template. The four-platform Flutter target (§5.1) is ambitious for a solo build, but it's a stated decision, not shape drift.</p>
+          </div>
+        </div>
+        <div class="findings-list">
+        </div>
+      </details>
+    </section>
+
+    <div class="mechanical">
+      <h3>Mechanical notes</h3>
+      <ul>
+        <li><strong>Glossary drift (minor):</strong> §2.1 says "phone, tablet, desktop, or browser" while §5.1 names "Android, iOS, macOS, and Chrome webapp" — "desktop" vs macOS-only, and "browser" vs Chrome-only. Harmless but worth aligning.</li>
+        <li><strong>ID continuity:</strong> FR-1–17 and UJ-1–5 contiguous and unique; no broken cross-references. SMs unnumbered (see finding above).</li>
+        <li><strong>Assumptions Index:</strong> No <code>[ASSUMPTION]</code> tags appear inline and no index exists — trivially consistent, but the mechanism is entirely unused (see Scope honesty).</li>
+        <li><strong>Risk threshold boundaries (§4.5 FR-17):</strong> "Low: 2 days overdue" reads as a point value; days 3–4 are unassigned by the letter of the text. Presumably Low spans 2–4 days, but state the ranges.</li>
+        <li><strong>FR shape consistency:</strong> FR-15 is the only FR without a Consequences block.</li>
+        <li><strong>Required sections:</strong> Vision, Target User, Glossary, Features, NFRs, Success Metrics, Out of Scope all present — appropriate set for the stakes.</li>
+      </ul>
+    </div>
+
+    <footer class="report-footer">
+      <div class="meta">
+        <span>Rubric: .agents/skills/bmad-prd/assets/prd-validation-checklist.md</span>
+        <span>Generated: 2026-10-27T21:31:31-05:00</span>
+      </div>
+    </footer>
+
+  </div>
+</body>
+</html>

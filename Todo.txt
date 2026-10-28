@@ -1,0 +1,14 @@
+MCPs needed:
+1- Github
+2- Atlassian
+3- Figma
+
+
+Todo:
+1- create github repo, check code in
+2- create Confluence project adn documentation tree
+3- create JIRA scrum board and convert stories to JIRA stories
+4- create zshrc secrets files for all APi keys
+5- create Atlassian API key
+6- create GitHub API key
+7- convert PRD to Confluence doc, use the Confluence page as golden copy
