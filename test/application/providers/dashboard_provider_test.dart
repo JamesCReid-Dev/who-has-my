@@ -1,30 +1,55 @@
+import 'dart:async';
+
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:whohasmy/application/providers/dashboard_provider.dart';
 
 void main() {
   group('DashboardNotifier', () {
     test('should initialize with empty state', () async {
-      final notifier = DashboardNotifier();
-      await Future.delayed(Duration.zero); // Allow async initialization
+      final container = ProviderContainer(overrides: []);
 
-      expect(notifier.state.value, isNotNull);
-      expect(notifier.state.value!.items, isEmpty);
-      expect(notifier.state.value!.loading, isFalse);
-      expect(notifier.state.value!.error, isNull);
+      // Wait for the AsyncNotifier's build() future to resolve
+      final completer = Completer<void>();
+      final subscription = container.listen<AsyncValue<DashboardState>>(
+        dashboardStateProvider,
+        (_, value) {
+          if (value.hasValue && !completer.isCompleted) {
+            completer.complete();
+          }
+        },
+        fireImmediately: true,
+      );
+
+      await completer.future;
+      subscription.close();
+
+      final state = container.read(dashboardStateProvider).value;
+      expect(state, isNotNull);
+      expect(state!.items, isEmpty);
+      expect(state.loading, isFalse);
+      expect(state.error, isNull);
+
+      container.dispose();
     });
 
     test('should set loading state during refresh', () async {
-      final notifier = DashboardNotifier();
-      
+      final container = ProviderContainer(
+        overrides: [],
+      );
+
       // Trigger refresh - this will fail since no repository is injected
       // but we can verify the loading state is set
       try {
-        await notifier.refresh();
+        await container.read(dashboardStateProvider.notifier).refresh();
       } catch (_) {
         // Expected to fail without repository injection
       }
 
-      expect(notifier.state.value, isNotNull);
+      final state = container.read(dashboardStateProvider).value;
+      expect(state, isNotNull);
+
+      container.dispose();
     });
 
     test('DashboardState should be immutable', () {
