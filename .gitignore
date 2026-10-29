@@ -1,0 +1,24 @@
+# Flutter/Dart
+build/
+.dart_tool/
+.packages
+*.iml
+.idea/
+*.log
+
+# Hive
+*.hive
+*.g.dart
+*.freezed.dart
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.sublime-*
+
+# Local config (secrets)
+*.env
+local.properties
