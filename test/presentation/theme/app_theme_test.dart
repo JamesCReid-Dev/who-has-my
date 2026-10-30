@@ -51,8 +51,8 @@ void main() {
       final theme = AppTheme.lightTheme;
       final textTheme = theme.textTheme;
       
-      // Body large should have default (dark) color in light theme
-      expect(textTheme.bodyLarge!.color, isNull); // Uses theme default
+      // Body large gets default (dark) color from Material 3 ColorScheme in light theme
+      expect(textTheme.bodyLarge!.color, isNotNull); // Material 3 sets default
     });
 
     test('dark theme body text should be white', () {
@@ -90,23 +90,16 @@ void main() {
       expect(textTheme.labelLarge!.fontWeight, equals(FontWeight.w500));
     });
 
-    test('MaterialApp should render with WhoHasMy theme', () {
-      final rendered = <Widget>[];
-      
-      runApp(
+    testWidgets('MaterialApp should render with WhoHasMy theme', (WidgetTester tester) async {
+      await tester.pumpWidget(
         MaterialApp(
           theme: AppTheme.lightTheme,
           darkTheme: AppTheme.darkTheme,
-          home: Builder(
-            builder: (context) {
-              rendered.add(context.findAncestorWidgetOfExactType<MaterialApp>()!);
-              return const SizedBox();
-            },
-          ),
+          home: const SizedBox(),
         ),
       );
 
-      expect(rendered.isNotEmpty, isTrue);
+      expect(find.byType(MaterialApp), findsOneWidget);
     });
   });
 }
