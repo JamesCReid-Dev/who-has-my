@@ -319,10 +319,11 @@ This process defines the step-by-step workflow to follow when a story or task ha
    - Ensure all existing tests continue to pass
    - Run `flutter test` locally before committing
 
-8. **Update any impacted documentation or designs:**
-   - Update Confluence pages in the **"Project-WhoHasMy"** space if architecture, API specs, or user-facing docs are affected
-   - Update Figma designs if UI/UX changes are made (link to updated design in Jira)
-   - Keep code-level doc comments (`///`) synchronized with implementation
+8. **Review design documentation for impacted changes:**
+   - Check Confluence pages in the **"Project-WhoHasMy"** space if architecture, API specs, or user-facing docs are affected by this story
+   - Check Figma designs if UI/UX changes are made
+   - If NO design updates needed: note "No design changes required for this story" in Jira comments
+   - If design updates ARE needed: update Confluence/Figma first, then link to updated design in Jira before proceeding
 
 9. **Execute all tests and add results to the Jira artifact:**
     - Run `flutter test` locally and ensure ALL tests pass (no failures, no errors)
@@ -343,6 +344,8 @@ This process defines the step-by-step workflow to follow when a story or task ha
       - test/another_file_test.dart
       ```
     - Include any manual testing notes if applicable
+
+10. **Only after ALL tests pass and results are posted as a Jira comment, transition to In Review.**
 
 ### Phase 4: Code Review & Pull Request
 
@@ -389,10 +392,10 @@ This process defines the step-by-step workflow to follow when a story or task ha
 | 5 | Verify issue appears in correct swimlane/column on sprint board | ☐ |
 | 6 | Assign Jira artifact to correct person | ☐ |
 | 7 | Implement story per acceptance criteria | ☐ |
-| 8 | Run `flutter test` — ensure ALL tests pass | ☐ |
-| 9 | Post test results as comment on Jira story (total, passed/failed, full output) | ☐ |
-| 10 | Update impacted docs/designs (Confluence/Figma) | ☐ |
-| 11 | Transition Jira status to In Review | ☐ |
+| 8 | Review design docs (Confluence/Figma) — if no changes needed, note "No design changes required" in Jira | ☐ |
+| 9 | Run `flutter test` — ensure ALL tests pass | ☐ |
+| 10 | Post test results as comment on Jira story (total, passed/failed, full output) | ☐ |
+| 11 | Only after tests posted: Transition Jira status to In Review | ☐ |
 | 12 | Commit with message: `<jira-id>-<status>` | ☐ |
 | 13 | Push changes to remote origin | ☐ |
 | 14 | Create Pull Request and request reviews | ☐ |
