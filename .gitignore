@@ -2,6 +2,7 @@
 build/
 .dart_tool/
 .packages
+pubspec.lock
 *.iml
 .idea/
 *.log
@@ -22,3 +23,21 @@ Thumbs.db
 # Local config (secrets)
 *.env
 local.properties
+
+# Android platform files
+android/
+
+# iOS platform files
+ios/
+
+# Linux desktop platform files
+linux/
+
+# macOS desktop platform files
+macos/
+
+# Web platform files
+web/
+
+# Windows desktop platform files
+windows/
