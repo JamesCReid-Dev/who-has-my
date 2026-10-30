@@ -1,12 +1,14 @@
+// import 'package:freezed_annotation/freezed_annotation.dart';
+// 
+// part 'contact.freezed.dart';
+// part 'contact.g.dart';
+
 /// Contact entity representing a person who can receive items.
-/// 
-/// Created via address book import or manual entry.
-/// Has a name and contact info (email, phone) for notifications.
 class Contact {
-  final String id;              // Hive key: "contact:{uuid}"
-  final String name;            // Required, non-empty, max 200 chars
-  final String? email;          // Optional but warned if missing in v1
-  final String? phone;          // Stored for future SMS (v2+), no v1 notifications
+  final String id;
+  final String name;
+  final String? email;
+  final String? phone;
   final DateTime createdAt;
   final DateTime? updatedAt;
 
@@ -19,7 +21,24 @@ class Contact {
     this.updatedAt,
   });
 
-  /// Copy with new values
+  factory Contact.fromJson(Map<String, dynamic> json) => Contact(
+        id: json['id'] as String,
+        name: json['name'] as String,
+        email: json['email'] as String?,
+        phone: json['phone'] as String?,
+        createdAt: DateTime.parse(json['createdAt'] as String),
+        updatedAt: json['updatedAt'] != null ? DateTime.parse(json['updatedAt'] as String) : null,
+      );
+
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'name': name,
+        'email': email,
+        'phone': phone,
+        'createdAt': createdAt.toIso8601String(),
+        'updatedAt': updatedAt?.toIso8601String(),
+      };
+
   Contact copyWith({
     String? name,
     String? email,
@@ -44,3 +63,4 @@ class Contact {
   @override
   int get hashCode => id.hashCode;
 }
+

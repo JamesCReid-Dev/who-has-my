@@ -36,3 +36,4 @@ abstract class LoanRepository {
   Future<void> update(Loan loan);
   Future<void> delete(String id);
 }
+

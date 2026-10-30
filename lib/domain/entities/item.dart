@@ -1,13 +1,15 @@
+// import 'package:freezed_annotation/freezed_annotation.dart';
+// 
+// part 'item.freezed.dart';
+// part 'item.g.dart';
+
 /// Item entity representing a physical object registered in the app.
-/// 
-/// Has a name, description, optional image, category, and condition.
-/// Can be in one of three statuses: Available, Loaned, or In-Maintenance.
 class Item {
-  final String id;              // Hive key: "item:{uuid}"
-  final String name;            // Required, non-empty, max 200 chars
-  final String? description;    // Optional, max 1000 chars
-  final String category;        // Required (default or custom)
-  final ItemStatus status;      // Available, Loaned, In-Maintenance
+  final String id;
+  final String name;
+  final String? description;
+  final String category;
+  final ItemStatus status;
   final DateTime createdAt;
   final DateTime? updatedAt;
 
@@ -16,12 +18,31 @@ class Item {
     required this.name,
     this.description,
     required this.category,
-    this.status = ItemStatus.available,
+    required this.status,
     required this.createdAt,
     this.updatedAt,
   });
 
-  /// Copy with new values
+  factory Item.fromJson(Map<String, dynamic> json) => Item(
+        id: json['id'] as String,
+        name: json['name'] as String,
+        description: json['description'] as String?,
+        category: json['category'] as String,
+        status: ItemStatus.values[json['status'] as int],
+        createdAt: DateTime.parse(json['createdAt'] as String),
+        updatedAt: json['updatedAt'] != null ? DateTime.parse(json['updatedAt'] as String) : null,
+      );
+
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'name': name,
+        'description': description,
+        'category': category,
+        'status': status.index,
+        'createdAt': createdAt.toIso8601String(),
+        'updatedAt': updatedAt?.toIso8601String(),
+      };
+
   Item copyWith({
     String? name,
     String? description,
@@ -51,3 +72,4 @@ class Item {
 
 /// Item status enum
 enum ItemStatus { available, loaned, inMaintenance }
+

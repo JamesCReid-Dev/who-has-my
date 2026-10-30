@@ -1,13 +1,16 @@
+// import 'package:freezed_annotation/freezed_annotation.dart';
+// 
+// part 'loan.freezed.dart';
+// part 'loan.g.dart';
+
 /// Loan entity representing a record linking an Item to a Contact with a due date.
-/// 
-/// A loan is active from creation until the owner confirms return.
 class Loan {
-  final String id;              // Hive key: "loan:{uuid}"
-  final String itemId;          // Reference to Item.id (Hive key string)
-  final String contactId;       // Reference to Contact.id (Hive key string)
-  final DateTime dueDate;       // Required, >= today
+  final String id;
+  final String itemId;
+  final String contactId;
+  final DateTime dueDate;
   final DateTime createdAt;
-  final bool isReturned;        // False = active, True = returned
+  final bool isReturned;
   final DateTime? returnedAt;
   final String? returnConditionNotes;
 
@@ -22,7 +25,28 @@ class Loan {
     this.returnConditionNotes,
   });
 
-  /// Copy with new values
+  factory Loan.fromJson(Map<String, dynamic> json) => Loan(
+        id: json['id'] as String,
+        itemId: json['itemId'] as String,
+        contactId: json['contactId'] as String,
+        dueDate: DateTime.parse(json['dueDate'] as String),
+        createdAt: DateTime.parse(json['createdAt'] as String),
+        isReturned: json['isReturned'] as bool? ?? false,
+        returnedAt: json['returnedAt'] != null ? DateTime.parse(json['returnedAt'] as String) : null,
+        returnConditionNotes: json['returnConditionNotes'] as String?,
+      );
+
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'itemId': itemId,
+        'contactId': contactId,
+        'dueDate': dueDate.toIso8601String(),
+        'createdAt': createdAt.toIso8601String(),
+        'isReturned': isReturned,
+        'returnedAt': returnedAt?.toIso8601String(),
+        'returnConditionNotes': returnConditionNotes,
+      };
+
   Loan copyWith({
     DateTime? dueDate,
     bool? isReturned,
@@ -49,3 +73,4 @@ class Loan {
   @override
   int get hashCode => id.hashCode;
 }
+
