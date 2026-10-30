@@ -42,6 +42,32 @@ class Item {
         'createdAt': createdAt.toIso8601String(),
         'updatedAt': updatedAt?.toIso8601String(),
       };
+
+  Item copyWith({
+    String? name,
+    String? description,
+    String? category,
+    ItemStatus? status,
+    DateTime? updatedAt,
+  }) {
+    return Item(
+      id: id,
+      name: name ?? this.name,
+      description: description ?? this.description,
+      category: category ?? this.category,
+      status: status ?? this.status,
+      createdAt: createdAt,
+      updatedAt: updatedAt ?? DateTime.now(),
+    );
+  }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is Item && runtimeType == other.runtimeType && id == other.id;
+
+  @override
+  int get hashCode => id.hashCode;
 }
 
 /// Item status enum

@@ -46,5 +46,31 @@ class Loan {
         'returnedAt': returnedAt?.toIso8601String(),
         'returnConditionNotes': returnConditionNotes,
       };
+
+  Loan copyWith({
+    DateTime? dueDate,
+    bool? isReturned,
+    DateTime? returnedAt,
+    String? returnConditionNotes,
+  }) {
+    return Loan(
+      id: id,
+      itemId: itemId,
+      contactId: contactId,
+      dueDate: dueDate ?? this.dueDate,
+      createdAt: createdAt,
+      isReturned: isReturned ?? this.isReturned,
+      returnedAt: returnedAt ?? this.returnedAt,
+      returnConditionNotes: returnConditionNotes ?? this.returnConditionNotes,
+    );
+  }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is Loan && runtimeType == other.runtimeType && id == other.id;
+
+  @override
+  int get hashCode => id.hashCode;
 }
 
