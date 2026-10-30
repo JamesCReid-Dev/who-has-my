@@ -1,0 +1,107 @@
+# Sprint Status Template
+# This is an EXAMPLE showing the expected format
+# The actual file will be generated with all epics/stories from your epic files
+
+# generated: {date}
+# project: {project_name}
+# project_key: {project_key}
+# tracking_system: {tracking_system}
+# story_location: {story_location}
+
+# STATUS DEFINITIONS:
+# ==================
+# Epic Status:
+#   - backlog: Epic not yet started
+#   - in-progress: Epic actively being worked on
+#   - done: All stories in epic completed
+#
+# Story Status:
+#   - backlog: Story only exists in epic file
+#   - ready-for-dev: Story file created, ready for development
+#   - in-progress: Developer actively working on implementation
+#   - review: Implementation complete, ready for review
+#   - done: Story completed
+#
+# Retrospective Status:
+#   - optional: Can be completed but not required
+#   - done: Retrospective has been completed
+#
+# Action Item Status:
+#   - open: Committed during a retrospective, not yet addressed
+#   - in-progress: Actively being worked on
+#   - done: Completed
+#
+# WORKFLOW NOTES:
+# ===============
+# - Epic transitions to 'in-progress' automatically when its first story starts (via build's sprint sync)
+# - Stories can be worked in parallel if team capacity allows
+# - Developer typically creates the next story after the previous one is 'done' to incorporate learnings
+# - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
+# - Retrospective appends its action items to action_items; the status view surfaces open ones
+
+generated: 10-29-2026 14:30
+last_updated: 10-29-2026 15:15
+project: WhoHasMy
+project_key: WHO
+tracking_system: jira
+story_location: "jira"
+
+development_status:
+  epic-1: in-progress
+  1-1-flutter-project-scaffolding-with-clean-architecture: done
+  1-2-hive-storage-initialization-and-repository-interfaces: backlog
+  1-3-riverpod-state-management-setup: backlog
+  1-4-theme-and-dark-mode-support: backlog
+  epic-1-retrospective: optional
+
+  epic-2: backlog
+  2-1-item-create-form-with-image-picker: backlog
+  2-2-item-list-view-with-search-filter-sort: backlog
+  2-3-item-detail-screen: backlog
+  2-4-edit-and-delete-items: backlog
+  2-5-category-management: backlog
+  2-6-bulk-import-export-csv-json: backlog
+  epic-2-retrospective: optional
+
+  epic-3: backlog
+  3-1-contact-create-form-with-photo-picker: backlog
+  3-2-contact-list-view-with-search-sort: backlog
+  3-3-contact-detail-screen: backlog
+  3-4-edit-and-delete-contacts: backlog
+  3-5-bulk-import-export-contacts: backlog
+  epic-3-retrospective: optional
+
+  epic-4: backlog
+  4-1-loan-create-flow-with-item-contact-selection: backlog
+  4-2-loan-list-view-with-filters: backlog
+  4-3-loan-detail-screen: backlog
+  4-4-mark-item-as-returned: backlog
+  4-5-overdue-items-display-and-sorting: backlog
+  4-6-loan-history-and-audit-trail: backlog
+  4-7-loan-edit-cancel-resume: backlog
+  epic-4-retrospective: optional
+
+  epic-5: backlog
+  5-1-dashboard-with-item-counts-status-breakdown: backlog
+  5-2-risk-ranking-algorithm-and-display: backlog
+  5-3-overdue-items-section-on-dashboard: backlog
+  5-4-recently-returned-items-carousel: backlog
+  epic-5-retrospective: optional
+
+  epic-6: backlog
+  6-1-smtp-server-configuration-screen: backlog
+  6-2-initial-loan-notification-email: backlog
+  6-3-overdue-reminder-emails: backlog
+  6-4-item-return-confirmation-email: backlog
+  6-5-scheduled-digest-emails: backlog
+  6-6-email-send-failure-handling-and-retry: backlog
+  epic-6-retrospective: optional
+
+  epic-7: backlog
+  7-1-owner-email-configuration: backlog
+  7-2-app-information-and-about-screen: backlog
+  7-3-offline-mode-banner-and-behavior: backlog
+  epic-7-retrospective: optional
+
+# Action items committed during retrospectives (section created by the retrospective workflow)
+action_items: []

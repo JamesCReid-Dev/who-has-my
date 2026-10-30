@@ -1,8 +1,8 @@
 ---
 title: WhoHasMy — Epics and User Stories
 created: 2026-10-27
-updated: 2026-10-27
-status: draft
+updated: 2026-10-29
+status: ready-for-dev
 sources:
   - _bmad-output/prd-whohasmy/prd-whohasmy/prd-whohasmy.md
   - _bmad-output/ux-whohasmy/DESIGN.md
@@ -662,13 +662,13 @@ sources:
 
 ---
 
-## Open Questions for Product Owner Review
+## Open Questions — Resolved
 
-| # | Question | Impacted Stories | Suggested Resolution |
-|---|---|---|---|
-| OQ-1 | Should the default due date be 14 days or configurable per-item? | STORY-016 | Default to 14 days (per UX spec); make configurable in Settings later |
-| OQ-2 | What happens when a borrower's email bounces? | STORY-028, STORY-031 | Log bounce in failed sends; show warning on next dashboard load |
-| OQ-3 | Should borrowers receive a "loan created" confirmation vs. just the reminder? | STORY-028 | Yes — initial loan email serves as both notification and confirmation (current design) |
+| # | Question | Impacted Stories | Resolution | Status |
+|---|----------|------------------|------------|--------|
+| OQ-1 | Should the default due date be 14 days or configurable per-item? | STORY-016 | **Resolved:** Default is today + 14 days (confirmed by UX spec, EXPERIENCE.md §RegistrationForm). Quick-select chips for "3 days", "1 week", "2 weeks", "1 month" are provided. Custom date always available. Per-item default configurability deferred to Settings in a future iteration. | ✅ Resolved |
+| OQ-2 | What happens when a borrower's email bounces? | STORY-028, STORY-031 | **Resolved:** Email send status is recorded on the loan record (per PRD FR-9). Failed sends are logged; owner sees a warning banner on dashboard load if any active loans have failed. Owner can retry or update borrower's email. No complex retry queue needed in v1 — simple log-and-warn approach. | ✅ Resolved |
+| OQ-3 | Should borrowers receive a "loan created" confirmation vs. just the reminder? | STORY-028 | **Resolved:** Yes — the initial loan email serves as both notification AND confirmation (per PRD FR-9: "System sends a notification email to the contact with loan details"). Email includes item name, borrower name, and due date, which confirms the loan was created. This is the current design. | ✅ Resolved |
 
 ---
 
