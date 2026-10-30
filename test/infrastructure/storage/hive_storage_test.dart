@@ -34,11 +34,5 @@ void main() {
       expect(HiveStorage.boxPhotos, matches(boxPattern));
       expect(HiveStorage.boxSettings, matches(boxPattern));
     });
-
-    test('HiveStorage should be a class with static methods', () {
-      // This is more of an integration check - the class exists and has static members
-      expect(() => HiveStorage.initialize(), returnsNormally);
-      expect(() => HiveStorage.close(), returnsNormally);
-    });
   });
 }

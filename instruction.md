@@ -279,7 +279,7 @@ This process defines the step-by-step workflow to follow when a story or task ha
 
 1. **Create a new Git branch locally** using the naming pattern:
    ```
-   <assigned-to-owner>-<phase>-<jira-artifact-id>
+   <assigned-to-owner>-<phase>-<story-number>
    ```
    - `<assigned-to-owner>` — The developer's initials or username (e.g., `jc`, `jsmith`)
    - `<phase>` — The development phase, such as:
@@ -288,9 +288,11 @@ This process defines the step-by-step workflow to follow when a story or task ha
      - `hotfix` for urgent production fixes
      - `refactor` for code refactoring
      - `test` for test-only changes
-   - `<jira-artifact-id>` — The Jira issue key (e.g., `PROJ-123`, `WHM-45`)
+   - `<story-number>` — The **Story number** from the Jira artifact (e.g., `STORY037`, `STORY-036`). This is NOT the Jira issue key.
 
-   **Example:** `jc-dev-WHM-123` or `jsmith-bugfix-WHM-99`
+   > **Important:** Use the Story number, not the Jira issue ID/key. The story number follows the pattern `STORY###` and can be found in the story's summary or description field.
+   >
+   > **Example:** `jc-dev-STORY037` or `jsmith-bugfix-STORY025`
 
 2. **Push the new branch to the remote origin repository:**
    ```bash
@@ -301,7 +303,9 @@ This process defines the step-by-step workflow to follow when a story or task ha
 
 ### Phase 2: Jira Artifact Initialization
 
-4. **Update the Jira artifact status** to reflect that work has begun (e.g., `In Progress`).
+4. **Transition the Jira issue to `In Progress`** using the proper workflow transition (not just changing status). This ensures the issue moves to the correct swimlane/column on the Jira board.
+    - Use a transition name like `"Start Progress"` or `"In Progress"` — not a raw status value.
+    - Verify the issue now appears in the active/in-progress column of the sprint board.
 
 5. **Assign the Jira artifact** to the requestor/assignee unless a specific assignee was called out in the story description or comments. Use the same person for both the Jira assignment and the branch ownership.
 
@@ -320,10 +324,25 @@ This process defines the step-by-step workflow to follow when a story or task ha
    - Update Figma designs if UI/UX changes are made (link to updated design in Jira)
    - Keep code-level doc comments (`///`) synchronized with implementation
 
-9. **Add test results to the Jira artifact** once successfully completed:
-   - Attach test reports or screenshots of passing tests
-   - Include any manual testing notes if applicable
-   - Reference specific test file paths and coverage metrics where relevant
+9. **Execute all tests and add results to the Jira artifact:**
+    - Run `flutter test` locally and ensure ALL tests pass (no failures, no errors)
+    - Capture the full test output including: total tests run, passed/failed counts, any coverage metrics
+    - Post the test results as a **comment on the Jira story** with the following format:
+      ```
+      ## Test Results
+      - Total tests: X
+      - Passed: X
+      - Failed: 0
+      - Errors: 0
+
+      ### Test Output
+      [paste full flutter test output here]
+
+      ### Files Tested
+      - test/path/to/file_test.dart
+      - test/another_file_test.dart
+      ```
+    - Include any manual testing notes if applicable
 
 ### Phase 4: Code Review & Pull Request
 
@@ -349,24 +368,34 @@ This process defines the step-by-step workflow to follow when a story or task ha
     - Reference impacted Confluence pages or Figma designs where applicable
     - Request reviews from appropriate team members
 
+14. **After the PR is merged (or once review is complete), clean up your local workspace:**
+    ```bash
+    git checkout main
+    git fetch origin main
+    git merge origin/main
+    ```
+    This ensures you have the latest changes from `main` before starting the next story, preventing stale code conflicts.
+
 ---
 
 ## Quick Reference Checklist
 
 | Step | Action | Done? |
 |------|--------|-------|
-| 1 | Create branch: `<owner>-<phase>-<jira-id>` | ☐ |
+| 1 | Create branch: `<owner>-<phase>-STORY###` (use Story number, NOT Jira key) | ☐ |
 | 2 | Push branch to remote origin | ☐ |
 | 3 | Checkout and set active branch | ☐ |
-| 4 | Update Jira status (e.g., In Progress) | ☐ |
-| 5 | Assign Jira artifact to correct person | ☐ |
-| 6 | Implement story per acceptance criteria | ☐ |
-| 7 | Write/run automated tests | ☐ |
-| 8 | Update impacted docs/designs (Confluence/Figma) | ☐ |
-| 9 | Add test results to Jira artifact | ☐ |
-| 10 | Update Jira status to In Review | ☐ |
-| 11 | Commit with message: `<jira-id>-<status>` | ☐ |
-| 12 | Push changes to remote origin | ☐ |
-| 13 | Create Pull Request and request reviews | ☐ |
+| 4 | Transition Jira issue to In Progress (proper workflow transition, not raw status) | ☐ |
+| 5 | Verify issue appears in correct swimlane/column on sprint board | ☐ |
+| 6 | Assign Jira artifact to correct person | ☐ |
+| 7 | Implement story per acceptance criteria | ☐ |
+| 8 | Run `flutter test` — ensure ALL tests pass | ☐ |
+| 9 | Post test results as comment on Jira story (total, passed/failed, full output) | ☐ |
+| 10 | Update impacted docs/designs (Confluence/Figma) | ☐ |
+| 11 | Transition Jira status to In Review | ☐ |
+| 12 | Commit with message: `<jira-id>-<status>` | ☐ |
+| 13 | Push changes to remote origin | ☐ |
+| 14 | Create Pull Request and request reviews | ☐ |
+| 15 | After merge: `git checkout main && git fetch origin main && git merge origin/main` | ☐ |
 
 
