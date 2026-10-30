@@ -371,14 +371,6 @@ This process defines the step-by-step workflow to follow when a story or task ha
     - Reference impacted Confluence pages or Figma designs where applicable
     - Request reviews from appropriate team members
 
-14. **Immediately after creating the PR, switch back to `main` and sync:**
-    ```bash
-    git checkout main
-    git fetch origin main
-    git merge origin/main
-    ```
-    This ensures your local workspace is on a clean `main` branch with the latest changes before starting the next story. **Do not continue working on the feature branch after the PR is created.**
-
 ---
 
 ## Quick Reference Checklist
@@ -399,6 +391,5 @@ This process defines the step-by-step workflow to follow when a story or task ha
 | 12 | Commit with message: `<jira-id>-<status>` | ☐ |
 | 13 | Push changes to remote origin | ☐ |
 | 14 | Create Pull Request and request reviews | ☐ |
-| 15 | Immediately after PR: `git checkout main && git fetch origin main && git merge origin/main` — do NOT continue on feature branch | ☐ |
 
 
