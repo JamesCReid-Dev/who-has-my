@@ -194,6 +194,63 @@ lib/
 
 ---
 
+## Mandatory Pre-Implementation Gates
+
+These gates enforce strict ordering of operations. **NO code changes, file creation, or file edits are permitted until all preceding gates have been explicitly verified and passed.** Violating these gates is a process failure that must be corrected before proceeding.
+
+### Gate 0: Story Identification & Context
+
+Before touching any code, you MUST:
+1. Identify the Jira issue key (e.g., `WHOH-3`) and the Story number (e.g., `STORY003`) from the user's request or by searching Jira.
+2. Retrieve the full story details including acceptance criteria from Jira.
+3. If design documentation is referenced, fetch Confluence pages or Figma designs for review.
+
+**GATE CHECK:** Confirm you have the correct Jira key, Story number, and acceptance criteria before proceeding. **DO NOT proceed to Gate 1 until this is complete.**
+
+### Gate 1: Branch Creation & Remote Push
+
+Before making ANY code changes, you MUST:
+1. Create a new Git branch using the naming pattern `<owner>-<phase>-STORY###` where `STORY###` is the Story number (NOT the Jira issue key).
+2. Push the branch to remote origin with `git push -u origin <branch-name>`.
+3. Verify the branch exists on remote by running `git branch -r | grep <branch-name>`.
+
+**GATE CHECK:** Confirm the branch is created locally AND pushed to remote before proceeding. **DO NOT proceed to Gate 2 until this is complete.**
+
+### Gate 2: Jira Initialization
+
+Before making ANY code changes, you MUST:
+1. Transition the Jira issue to `In Progress` using a proper workflow transition (not raw status).
+2. Assign the Jira artifact to the correct person.
+3. Verify the issue appears in the active column on the sprint board.
+
+**GATE CHECK:** Confirm Jira is initialized and the issue is in `In Progress` before proceeding. **DO NOT proceed to Gate 3 until this is complete.**
+
+### Gate 3: Implementation (Code Changes Allowed)
+
+Only after Gates 0, 1, and 2 are passed may you begin implementing code changes. All implementation must follow Clean Architecture boundaries, naming conventions, and testing guidelines defined elsewhere in this document.
+
+**GATE CHECK:** Confirm all acceptance criteria are met and tests pass before proceeding to Gate 4. **DO NOT proceed to Gate 4 until this is complete.**
+
+### Gate 4: Test Results Posted to Jira
+
+Before transitioning the issue status, you MUST:
+1. Run `flutter test` and ensure ALL tests pass.
+2. Post the full test results as a comment on the Jira story in the required format.
+
+**GATE CHECK:** Confirm test results are posted as a Jira comment before proceeding. **DO NOT transition to In Review until this is complete.**
+
+### Gate 5: Commit, Push & PR
+
+After all previous gates are passed and tests are posted:
+1. Transition the Jira issue status (e.g., to `In Review`).
+2. Stage and commit with message `<jira-id>-<status>`.
+3. Push to remote origin.
+4. Create a Pull Request linking to the Jira artifact.
+
+**GATE CHECK:** Confirm PR is created and linked before considering the story complete.
+
+---
+
 ## General Guardrails for Cline
 
 1. **Always respect Clean Architecture boundaries** — never let domain code depend on presentation or infrastructure.
@@ -275,7 +332,9 @@ All agile and project management documentation must be created and maintained in
 
 This process defines the step-by-step workflow to follow when a story or task has been requested to begin implementation in Jira.
 
-### Phase 1: Branch Creation & Setup
+> **⚠️ CRITICAL: The Mandatory Pre-Implementation Gates section above takes precedence over this workflow.** You MUST pass all gates before proceeding. This section provides additional context for each phase but does NOT override the gate requirements.
+
+### Phase 1: Branch Creation & Setup (Gate 0 → Gate 1)
 
 1. **Create a new Git branch locally** using the naming pattern:
    ```
@@ -301,7 +360,7 @@ This process defines the step-by-step workflow to follow when a story or task ha
 
 3. **Ensure the branch is checked out and set as the active working branch.**
 
-### Phase 2: Jira Artifact Initialization
+### Phase 2: Jira Artifact Initialization (Gate 1 → Gate 2)
 
 4. **Transition the Jira issue to `In Progress`** using the proper workflow transition (not just changing status). This ensures the issue moves to the correct swimlane/column on the Jira board.
     - Use a transition name like `"Start Progress"` or `"In Progress"` — not a raw status value.
@@ -309,7 +368,7 @@ This process defines the step-by-step workflow to follow when a story or task ha
 
 5. **Assign the Jira artifact** to the requestor/assignee unless a specific assignee was called out in the story description or comments. Use the same person for both the Jira assignment and the branch ownership.
 
-### Phase 3: Implementation & Testing
+### Phase 3: Implementation & Testing (Gate 2 → Gate 3)
 
 6. **Implement the story requirements** following Clean Architecture boundaries, naming conventions, and code generation rules defined elsewhere in this document.
 
@@ -347,7 +406,7 @@ This process defines the step-by-step workflow to follow when a story or task ha
 
 10. **Only after ALL tests pass and results are posted as a Jira comment, transition to In Review.**
 
-### Phase 4: Code Review & Pull Request
+### Phase 4: Code Review & Pull Request (Gate 3 → Gate 5)
 
 10. **Update the Jira artifact status to `In Review`** once implementation is complete and all acceptance criteria are met.
 
@@ -375,21 +434,24 @@ This process defines the step-by-step workflow to follow when a story or task ha
 
 ## Quick Reference Checklist
 
-| Step | Action | Done? |
-|------|--------|-------|
-| 1 | Create branch: `<owner>-<phase>-STORY###` (use Story number, NOT Jira key) | ☐ |
-| 2 | Push branch to remote origin | ☐ |
-| 3 | Checkout and set active branch | ☐ |
-| 4 | Transition Jira issue to In Progress (proper workflow transition, not raw status) | ☐ |
-| 5 | Verify issue appears in correct swimlane/column on sprint board | ☐ |
-| 6 | Assign Jira artifact to correct person | ☐ |
-| 7 | Implement story per acceptance criteria | ☐ |
-| 8 | Review design docs (Confluence/Figma) — if no changes needed, note "No design changes required" in Jira | ☐ |
-| 9 | Run `flutter test` — ensure ALL tests pass | ☐ |
-| 10 | Post test results as comment on Jira story (total, passed/failed, full output) | ☐ |
-| 11 | Only after tests posted: Transition Jira status to In Review | ☐ |
-| 12 | Commit with message: `<jira-id>-<status>` | ☐ |
-| 13 | Push changes to remote origin | ☐ |
-| 14 | Create Pull Request and request reviews | ☐ |
+| Step | Action | Done? | Gate |
+|------|--------|-------|------|
+| 0 | Identify Jira key, Story number, and acceptance criteria | ☐ | Gate 0 |
+| 1 | Create branch: `<owner>-<phase>-STORY###` (use Story number, NOT Jira key) | ☐ | Gate 1 |
+| 2 | Push branch to remote origin | ☐ | Gate 1 |
+| 3 | Checkout and set active branch | ☐ | Gate 1 |
+| 4 | Transition Jira issue to In Progress (proper workflow transition, not raw status) | ☐ | Gate 2 |
+| 5 | Verify issue appears in correct swimlane/column on sprint board | ☐ | Gate 2 |
+| 6 | Assign Jira artifact to correct person | ☐ | Gate 2 |
+| **GATE 1 & 2 PASSED — Code changes now permitted** | | | |
+| 7 | Implement story per acceptance criteria | ☐ | Gate 3 |
+| 8 | Review design docs (Confluence/Figma) — if no changes needed, note "No design changes required" in Jira | ☐ | Gate 3 |
+| 9 | Run `flutter test` — ensure ALL tests pass | ☐ | Gate 4 |
+| 10 | Post test results as comment on Jira story (total, passed/failed, full output) | ☐ | Gate 4 |
+| **GATE 4 PASSED — Status transition now permitted** | | | |
+| 11 | Only after tests posted: Transition Jira status to In Review | ☐ | Gate 5 |
+| 12 | Commit with message: `<jira-id>-<status>` | ☐ | Gate 5 |
+| 13 | Push changes to remote origin | ☐ | Gate 5 |
+| 14 | Create Pull Request and request reviews | ☐ | Gate 5 |
 
 
