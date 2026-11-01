@@ -3,94 +3,179 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:whohasmy/presentation/theme/app_theme.dart';
 
 void main() {
-  group('AppTheme', () {
-    test('should have correct primary blue color', () {
+  group('AppTheme — STORY-004 Acceptance Criteria', () {
+    
+    // ─── AC1: Material 3 theme configured with WhoHasMy custom color tokens ──
+    
+    test('AC1: should have correct primary blue color (#1565C0)', () {
       expect(AppTheme.primaryBlue, equals(const Color(0xFF1565C0)));
     });
 
-    test('should have correct secondary amber color', () {
+    test('AC1: should have correct secondary amber color (#FFA726)', () {
       expect(AppTheme.secondaryAmber, equals(const Color(0xFFFFA726)));
     });
 
-    test('should have correct risk semantic colors', () {
-      // Risk green - success/low risk
-      expect(AppTheme.riskGreen, equals(const Color(0xFF43A047)));
-      
-      // Risk amber - approaching due
-      expect(AppTheme.riskAmber, equals(const Color(0xFFFB8C00)));
-      
-      // Risk orange-red - medium/high risk
-      expect(AppTheme.riskOrangeRed, equals(const Color(0xFFFF7043)));
-      
-      // Risk red - high/urgent risk
-      expect(AppTheme.riskRed, equals(const Color(0xFFE53935)));
-    });
-
-    test('should have correct spacing tokens', () {
-      expect(AppTheme.spacingXs, equals(4.0));
-      expect(AppTheme.spacingSm, equals(8.0));
-      expect(AppTheme.spacingMd, equals(12.0));
-      expect(AppTheme.spacingLg, equals(16.0));
-      expect(AppTheme.spacingXl, equals(24.0));
-      expect(AppTheme.spacingXXl, equals(32.0));
-    });
-
-    test('light theme should use Material 3', () {
+    test('AC1: light theme should use Material 3 with primary seed', () {
       final theme = AppTheme.lightTheme;
       expect(theme.useMaterial3, isTrue);
       expect(theme.brightness, equals(Brightness.light));
+      // Seed color generates the full palette - verify key colors derived from it
+      expect(theme.colorScheme.primary, equals(AppTheme.primaryBlue));
     });
 
-    test('dark theme should use Material 3', () {
+    test('AC1: dark theme should use Material 3 with primary seed', () {
       final theme = AppTheme.darkTheme;
       expect(theme.useMaterial3, isTrue);
       expect(theme.brightness, equals(Brightness.dark));
+      // Seed color generates the full palette - verify key colors derived from it
+      expect(theme.colorScheme.primary, equals(AppTheme.primaryLight));
     });
 
-    test('light theme text colors should be dark on light background', () {
+    test('AC1: light theme should have custom color scheme extensions', () {
       final theme = AppTheme.lightTheme;
-      final textTheme = theme.textTheme;
-      
-      // Body large gets default (dark) color from Material 3 ColorScheme in light theme
-      expect(textTheme.bodyLarge!.color, isNotNull); // Material 3 sets default
+      expect(theme.colorScheme.primary, equals(AppTheme.primaryBlue));
+      expect(theme.colorScheme.secondary, equals(AppTheme.secondaryAmber));
+      expect(theme.colorScheme.surface, equals(AppTheme.surfaceLight));
     });
 
-    test('dark theme body text should be white', () {
+    test('AC1: dark theme should have custom color scheme extensions', () {
       final theme = AppTheme.darkTheme;
-      final textTheme = theme.textTheme;
-      
-      expect(textTheme.bodyLarge!.color, equals(Colors.white));
-      expect(textTheme.bodyMedium!.color, equals(Colors.white70));
+      expect(theme.colorScheme.primary, equals(AppTheme.primaryLight));
+      expect(theme.colorScheme.secondary, equals(AppTheme.secondaryAmber));
+      expect(theme.colorScheme.surface, equals(AppTheme.surfaceDark));
     });
 
-    test('theme should have Inter font family configured', () {
-      final lightTheme = AppTheme.lightTheme;
-      final darkTheme = AppTheme.darkTheme;
-      
-      // Check that typography is configured (font family should be 'Inter')
-      expect(lightTheme.textTheme.displayLarge!.fontFamily, equals('Inter'));
-      expect(darkTheme.textTheme.displayLarge!.fontFamily, equals('Inter'));
+    // ─── AC2: Risk semantic colors mapped correctly ──────────────────────
+
+    test('AC2: should have correct risk green color (#43A047)', () {
+      expect(AppTheme.riskNone, equals(const Color(0xFF43A047)));
     });
 
-    test('theme should have correct typography sizes', () {
+    test('AC2: should have correct risk amber color (#FB8C00)', () {
+      expect(AppTheme.riskLow, equals(const Color(0xFFFB8C00)));
+    });
+
+    test('AC2: should have correct risk orange-red color (#FF7043)', () {
+      expect(AppTheme.riskMedium, equals(const Color(0xFFFF7043)));
+    });
+
+    test('AC2: should have correct risk red color (#E53935)', () {
+      expect(AppTheme.riskHigh, equals(const Color(0xFFE53935)));
+    });
+
+    test('AC2: getRiskColor returns green for on-time items', () {
+      expect(AppTheme.getRiskColor(0), equals(AppTheme.riskNone));
+      expect(AppTheme.getRiskColor(-1), equals(AppTheme.riskNone));
+    });
+
+    test('AC2: getRiskColor returns amber for 1-4 days overdue', () {
+      expect(AppTheme.getRiskColor(1), equals(AppTheme.riskLow));
+      expect(AppTheme.getRiskColor(2), equals(AppTheme.riskLow));
+      expect(AppTheme.getRiskColor(3), equals(AppTheme.riskLow));
+      expect(AppTheme.getRiskColor(4), equals(AppTheme.riskLow));
+    });
+
+    test('AC2: getRiskColor returns orange-red for 5 days overdue', () {
+      expect(AppTheme.getRiskColor(5), equals(AppTheme.riskMedium));
+    });
+
+    test('AC2: getRiskColor returns red for >5 days overdue', () {
+      expect(AppTheme.getRiskColor(6), equals(AppTheme.riskHigh));
+      expect(AppTheme.getRiskColor(10), equals(AppTheme.riskHigh));
+    });
+
+    // ─── AC3: Typography scale implemented (Inter font, 7 sizes) ──────────
+
+    test('AC3: displayLarge should be 57px Inter', () {
+      final style = AppTheme.displayLarge;
+      expect(style.fontFamily, equals('Inter'));
+      expect(style.fontSize, equals(57));
+      expect(style.fontWeight, equals(FontWeight.w400));
+    });
+
+    test('AC3: headlineMedium should be 24px Inter semi-bold', () {
+      final style = AppTheme.headlineMedium;
+      expect(style.fontFamily, equals('Inter'));
+      expect(style.fontSize, equals(24));
+      expect(style.fontWeight, equals(FontWeight.w600));
+    });
+
+    test('AC3: bodyLarge should be 16px Inter', () {
+      final style = AppTheme.bodyLarge;
+      expect(style.fontFamily, equals('Inter'));
+      expect(style.fontSize, equals(16));
+    });
+
+    test('AC3: labelLarge should be 14px Inter medium', () {
+      final style = AppTheme.labelLarge;
+      expect(style.fontFamily, equals('Inter'));
+      expect(style.fontSize, equals(14));
+      expect(style.fontWeight, equals(FontWeight.w500));
+    });
+
+    test('AC3: light theme text should use Inter font family', () {
       final textTheme = AppTheme.lightTheme.textTheme;
-      
-      // Display large - 57px
-      expect(textTheme.displayLarge!.fontSize, equals(57));
-      
-      // Headline medium - 24px with semi-bold
-      expect(textTheme.headlineMedium!.fontSize, equals(24));
-      expect(textTheme.headlineMedium!.fontWeight, equals(FontWeight.w600));
-      
-      // Body large - 16px
-      expect(textTheme.bodyLarge!.fontSize, equals(16));
-      
-      // Label large - 14px with medium weight
-      expect(textTheme.labelLarge!.fontSize, equals(14));
-      expect(textTheme.labelLarge!.fontWeight, equals(FontWeight.w500));
+      expect(textTheme.displayLarge!.fontFamily, equals('Inter'));
+      expect(textTheme.bodyLarge!.fontFamily, equals('Inter'));
+      expect(textTheme.labelLarge!.fontFamily, equals('Inter'));
     });
 
-    testWidgets('MaterialApp should render with WhoHasMy theme', (WidgetTester tester) async {
+    // ─── AC4: Spacing tokens applied (xs=4px through xl=32px) ─────────────
+
+    test('AC4: spacingXs should be 4.0', () {
+      expect(AppTheme.spacingXs, equals(4.0));
+    });
+
+    test('AC4: spacingSm should be 8.0', () {
+      expect(AppTheme.spacingSm, equals(8.0));
+    });
+
+    test('AC4: spacingMd should be 12.0', () {
+      expect(AppTheme.spacingMd, equals(12.0));
+    });
+
+    test('AC4: spacingLg should be 16.0', () {
+      expect(AppTheme.spacingLg, equals(16.0));
+    });
+
+    test('AC4: spacingXl should be 24.0', () {
+      expect(AppTheme.spacingXl, equals(24.0));
+    });
+
+    test('AC4: spacingXXl should be 32.0', () {
+      expect(AppTheme.spacingXXl, equals(32.0));
+    });
+
+    test('AC4: getSpacing returns correct values for all tokens', () {
+      expect(AppTheme.getSpacing('xs'), equals(4.0));
+      expect(AppTheme.getSpacing('sm'), equals(8.0));
+      expect(AppTheme.getSpacing('md'), equals(12.0));
+      expect(AppTheme.getSpacing('lg'), equals(16.0));
+      expect(AppTheme.getSpacing('xl'), equals(24.0));
+      expect(AppTheme.getSpacing('xxl'), equals(32.0));
+    });
+
+    // ─── AC5: Dark mode support via Material 3 dynamic color scheme ──────
+
+    test('AC5: dark theme should have light text colors', () {
+      final theme = AppTheme.darkTheme;
+      expect(theme.textTheme.bodyLarge!.color, equals(AppTheme.onSurfaceDark));
+      expect(theme.textTheme.labelLarge!.color, equals(AppTheme.onSurfaceDark));
+    });
+
+    test('AC5: dark theme should have dark surface color', () {
+      final theme = AppTheme.darkTheme;
+      expect(theme.colorScheme.surface, equals(AppTheme.surfaceDark));
+    });
+
+    test('AC5: light theme should have light text colors', () {
+      final theme = AppTheme.lightTheme;
+      expect(theme.textTheme.bodyLarge!.color, equals(AppTheme.onSurfaceLight));
+    });
+
+    // ─── AC6/7/8: Theme renders correctly in MaterialApp ──────────────────
+
+    testWidgets('AC6-8: MaterialApp should render with WhoHasMy theme', (WidgetTester tester) async {
       await tester.pumpWidget(
         MaterialApp(
           theme: AppTheme.lightTheme,
@@ -100,6 +185,64 @@ void main() {
       );
 
       expect(find.byType(MaterialApp), findsOneWidget);
+    });
+
+    testWidgets('AC6-8: light theme renders correctly', (WidgetTester tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: AppTheme.lightTheme,
+          home: Builder(
+            builder: (context) {
+              final theme = Theme.of(context);
+              expect(theme.useMaterial3, isTrue);
+              expect(theme.colorScheme.primary, equals(AppTheme.primaryBlue));
+              return const SizedBox();
+            },
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+      expect(find.byType(MaterialApp), findsOneWidget);
+    });
+
+    testWidgets('AC6-8: dark theme renders correctly', (WidgetTester tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          darkTheme: AppTheme.darkTheme,
+          themeMode: ThemeMode.dark,
+          home: Builder(
+            builder: (context) {
+              final theme = Theme.of(context);
+              expect(theme.useMaterial3, isTrue);
+              expect(theme.brightness, equals(Brightness.dark));
+              return const SizedBox();
+            },
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+      expect(find.byType(MaterialApp), findsOneWidget);
+    });
+
+    // ─── Additional Component Theme Tests ────────────────────────────────
+
+    test('AC1: FAB should use secondary amber color', () {
+      final theme = AppTheme.lightTheme;
+      expect(theme.floatingActionButtonTheme.backgroundColor, equals(AppTheme.secondaryAmber));
+    });
+
+    test('AC1: elevated buttons should use primary blue', () {
+      final theme = AppTheme.lightTheme;
+      expect(theme.elevatedButtonTheme.style?.backgroundColor?.resolve({}), equals(AppTheme.primaryBlue));
+    });
+
+    test('AC4: input decoration should have proper styling', () {
+      final theme = AppTheme.lightTheme;
+      final inputTheme = theme.inputDecorationTheme;
+      expect(inputTheme.filled, isTrue);
+      expect(inputTheme.border, isNotNull);
     });
   });
 }
